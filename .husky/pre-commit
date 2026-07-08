@@ -1,0 +1,2 @@
+pnpm exec lint-staged
+pnpm exec commitlint --edit $1

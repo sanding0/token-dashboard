@@ -13,6 +13,11 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      "import/no-anonymous-default-export": "off",
+    }
+  }
 ]);
 
 export default eslintConfig;
