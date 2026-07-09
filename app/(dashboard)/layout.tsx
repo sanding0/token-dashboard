@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/layout/sidebar";
+import { AppSidebar } from "@/components/common/sidebar";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import WalletComponent from "@/components/wallet/wallet";
 
