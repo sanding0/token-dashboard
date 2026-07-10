@@ -8,23 +8,22 @@ import { toast } from "sonner"
 export default function WalletComponent({
     ...props
 }) {
-    const { isConnected } = useConnection()
-    
+    const { status, connector } = useConnection()
     useConnectionEffect({
-        onConnect(data){
-            console.log(data,'onConnect');
-            if(!data.isReconnected){
+        onConnect(data) {
+            console.log(data, 'onConnect');
+            if (!data.isReconnected) {
                 toast.success('Wallet connected successfully');
             }
         },
-        onDisconnect(){
+        onDisconnect() {
             toast.info('Wallet disconnected successfully');
         }
     })
 
     return (
-        <div className="h-16 p-4 flex justify-end w-full shrink-0" {...props}>
-            {isConnected ? <WalletInfo /> : <ConnectButton />}
+        <div className="p-2 flex justify-end w-full shrink-0" {...props}>
+            {status === 'connected' ? <WalletInfo connector={connector} /> : <ConnectButton />}
         </div>
     )
 }

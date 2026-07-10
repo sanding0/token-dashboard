@@ -7,7 +7,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 items-center justify-end gap-4 px-4">
+        <header className="flex items-center justify-end gap-4 px-4">
           <SidebarTrigger className="md:hidden" />
           <WalletComponent />
         </header>
