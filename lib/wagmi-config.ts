@@ -1,18 +1,20 @@
-import { mainnet, sepolia } from "viem/chains";
+import { arbitrum, mainnet, polygon, sepolia } from "viem/chains";
 import { createConfig, http } from "wagmi";
 import { walletConnect } from "wagmi/connectors";
 
 export const wagmiConfig = createConfig({
-    chains: [mainnet, sepolia],
+    chains: [mainnet, arbitrum, polygon, sepolia],
     ssr: true,
     connectors: [
         walletConnect({
-            projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
+            projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '',
             showQrModal: true
         })
     ],
     transports: {
-        [mainnet.id]: http(),
+        [mainnet.id]: http(process.env.NEXT_PUBLIC_MAINNET_RPC_URL || ''),
         [sepolia.id]: http(),
+        [arbitrum.id]: http(),
+        [polygon.id]: http(),
     }
 })
