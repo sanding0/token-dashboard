@@ -4,10 +4,14 @@ on:
   push:
     paths:
       - "contracts/**"
+      - "lib/abis/**"
+      - "scripts/export-abi.mjs"
       - ".github/workflows/contracts.yml"
   pull_request:
     paths:
       - "contracts/**"
+      - "lib/abis/**"
+      - "scripts/export-abi.mjs"
       - ".github/workflows/contracts.yml"
   workflow_dispatch:
 
@@ -22,7 +26,7 @@ jobs:
         working-directory: contracts
 
     steps:
-      - uses: actions/checkout@v6  
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
 
@@ -37,6 +41,15 @@ jobs:
 
       - name: Build
         run: forge build --sizes
+
+      - name: Check ABI is up to date
+        working-directory: ${{ github.workspace }}
+        run: |
+          node scripts/export-abi.mjs
+          if ! git diff --exit-code -- lib/abis; then
+            echo "::error::lib/abis is out of date. Run 'pnpm abi:sync' locally and commit lib/abis."
+            exit 1
+          fi
 
       - name: Test
         run: forge test -vvv
