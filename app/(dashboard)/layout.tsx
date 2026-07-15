@@ -11,7 +11,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <SidebarTrigger className="md:hidden" />
           <WalletComponent />
         </header>
-        {children}
+        <main className="p-4">
+          {children}
+        </main>
       </SidebarInset>
     </>
   )

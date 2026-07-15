@@ -30,7 +30,9 @@ export default function ChainSwitchDialog({ trigger }: ChainSwitchDialogProps) {
             setDialogOpen(false)
         } catch (error) {
             const message = getSwitchChainErrorMessage(error)
-            toast.error(message)
+            if (message) {
+                toast.error(message)
+            }
         } finally {
             setLoadingChainId(null)
         }
