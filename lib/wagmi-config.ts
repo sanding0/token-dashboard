@@ -1,9 +1,9 @@
-import { arbitrum, mainnet, polygon, sepolia } from "viem/chains";
+import { arbitrum, mainnet, polygon, sepolia, anvil } from "viem/chains";
 import { createConfig, http } from "wagmi";
 import { walletConnect } from "wagmi/connectors";
 
 export const wagmiConfig = createConfig({
-    chains: [mainnet, arbitrum, polygon, sepolia],
+    chains: [mainnet, arbitrum, polygon, sepolia, anvil],
     ssr: true,
     connectors: [
         walletConnect({
@@ -16,5 +16,6 @@ export const wagmiConfig = createConfig({
         [sepolia.id]: http(),
         [arbitrum.id]: http(),
         [polygon.id]: http(),
+        [anvil.id]: http(),
     }
 })

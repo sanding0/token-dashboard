@@ -10,7 +10,8 @@
     "contracts:build": "forge build --root contracts",
     "abi:export": "node scripts/export-abi.mjs",
     "abi:sync": "pnpm contracts:build && pnpm abi:export",
-    "abi:check": "node scripts/check-abi-staged.mjs"
+    "abi:check": "node scripts/check-abi-staged.mjs",
+    "deploy:anvil": "node scripts/deploy-anvil.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs}": "eslint --fix",
