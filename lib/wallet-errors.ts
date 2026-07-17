@@ -40,3 +40,12 @@ export function getSwitchChainErrorMessage(error: unknown): string | null {
     }
     return 'Switching network failed, please try again later'
 }
+
+
+export function getMintErrorMessage(error: unknown): string | null {
+    if (isUserRejected(error)) return "User rejected the transaction"
+    if (error instanceof Error) {
+        return error.message
+    }
+    return 'Mint transaction failed, please try again later'
+}

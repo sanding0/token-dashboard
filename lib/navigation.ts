@@ -1,4 +1,4 @@
-import { House, Plus, type LucideIcon } from "lucide-react"
+import { House, Plus, Settings, type LucideIcon } from "lucide-react"
 
 export type NavigationItem = {
     label: string
@@ -25,5 +25,10 @@ export const navigationItems: NavigationEntry[] = [
         label: "Mint",
         href: "/mint",
         icon: Plus,
+    },
+    {
+        label: "settings",
+        href: "/settings",
+        icon: Settings,
     }
 ]
