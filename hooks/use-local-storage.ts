@@ -24,6 +24,10 @@ function getServerSnapshot() {
   return null as string | null
 }
 
+function subscribeHydration() {
+  return () => {}
+}
+
 export function useLocalStorage<T>(key: string, initialValue: T) {
   const getSnapshot = () => {
     try {
@@ -34,6 +38,13 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   }
 
   const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+
+  // false on server + during hydration; true after client takes over — no useEffect
+  const hydrated = useSyncExternalStore(
+    subscribeHydration,
+    () => true,
+    () => false,
+  )
 
   const storedValue = parseStored(raw, initialValue)
 
@@ -59,8 +70,6 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       /* ignore */
     }
   }, [key])
-
-  const hydrated = typeof window !== "undefined"
 
   return [storedValue, setValue, { hydrated, remove }] as const
 }

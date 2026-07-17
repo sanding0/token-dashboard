@@ -1,4 +1,6 @@
-import type { Abi, Address } from "viem"
+'use client'
+
+import { erc20Abi, type Abi, type Address } from "viem"
 import { useReadContract } from "wagmi"
 
 export type TokenMeta = {
@@ -7,35 +9,51 @@ export type TokenMeta = {
     symbol: string
 }
 
-export function useTokenOwner(abi: Abi, tokenAddress?: Address) {
+type TokenContractParams = {
+    contractAddress?: Address
+    chainId?: number
+}
+
+export function useTokenOwner(
+    { contractAddress, chainId }: TokenContractParams,
+    abi: Abi = erc20Abi,
+) {
     const { data: owner } = useReadContract({
-        address: tokenAddress,
+        address: contractAddress,
         abi,
         functionName: "owner",
-        query: { enabled: Boolean(tokenAddress) },
+        chainId,
+        query: { enabled: Boolean(contractAddress) },
     })
     return owner as Address | undefined
 }
 
-export function useERC20TokenMeta(abi: Abi, tokenAddress?: Address) {
+export function useERC20TokenMeta(
+    { contractAddress, chainId }: TokenContractParams,
+    abi: Abi = erc20Abi,
+) {
     const { data: name } = useReadContract({
-        address: tokenAddress,
+        address: contractAddress,
         abi,
         functionName: "name",
-        query: { enabled: Boolean(tokenAddress) },
+        chainId,
+        query: { enabled: Boolean(contractAddress) },
     })
 
     const { data: decimals } = useReadContract({
-        address: tokenAddress,
+        address: contractAddress,
         abi,
         functionName: "decimals",
-        query: { enabled: Boolean(tokenAddress) },
+        chainId,
+        query: { enabled: Boolean(contractAddress) },
     })
+
     const { data: symbol } = useReadContract({
-        address: tokenAddress,
+        address: contractAddress,
         abi,
         functionName: "symbol",
-        query: { enabled: Boolean(tokenAddress) },
+        chainId,
+        query: { enabled: Boolean(contractAddress) },
     })
 
     return { name, decimals, symbol } as Partial<TokenMeta>

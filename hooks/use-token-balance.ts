@@ -1,32 +1,44 @@
-import { formatUnits, type Abi, type Address } from "viem"
+'use client'
+
+import { erc20Abi, formatUnits, type Abi, type Address } from "viem"
 import { useReadContract } from "wagmi"
 
-export function useTokenBalance(abi: Abi, tokenAddress?: Address, account?: Address) {
+type TokenBalanceParams = {
+    contractAddress?: Address
+    accountAddress?: Address
+    chainId?: number
+}
+
+export function useTokenBalance(
+    { contractAddress, accountAddress, chainId }: TokenBalanceParams,
+    abi: Abi = erc20Abi,
+) {
     const {
         data: decimals,
         isLoading: isDecimalsLoading,
         isError: isDecimalsError,
         error: decimalsError,
-        refetch: refetchDecimals
+        refetch: refetchDecimals,
     } = useReadContract({
-        address: tokenAddress,
+        address: contractAddress,
         abi,
         functionName: "decimals",
-        query: { enabled: Boolean(tokenAddress) },
+        chainId,
+        query: { enabled: Boolean(contractAddress) },
     })
     const {
         data: raw,
-        isLoading:
-        isBalanceLoading,
+        isLoading: isBalanceLoading,
         isError: isBalanceError,
         error: balanceError,
-        refetch: refetchBalance
+        refetch: refetchBalance,
     } = useReadContract({
-        address: tokenAddress,
+        address: contractAddress,
         abi,
         functionName: "balanceOf",
-        args: account ? [account] : undefined,
-        query: { enabled: Boolean(tokenAddress && account) },
+        args: accountAddress ? [accountAddress] : undefined,
+        chainId,
+        query: { enabled: Boolean(contractAddress && accountAddress) },
     })
 
     const formatted =
@@ -35,7 +47,8 @@ export function useTokenBalance(abi: Abi, tokenAddress?: Address, account?: Addr
             : undefined
 
     return {
-        raw, formatted,
+        raw,
+        formatted,
         decimals,
         isLoading: isDecimalsLoading || isBalanceLoading,
         isError: isDecimalsError || isBalanceError,
@@ -43,6 +56,6 @@ export function useTokenBalance(abi: Abi, tokenAddress?: Address, account?: Addr
         refetch: () => {
             refetchDecimals()
             refetchBalance()
-        }
+        },
     }
 }
