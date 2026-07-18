@@ -1,5 +1,3 @@
-'use client'
-
 import { erc20Abi, type Abi, type Address } from "viem"
 import { useReadContract } from "wagmi"
 
@@ -18,21 +16,27 @@ export function useTokenOwner(
     { contractAddress, chainId }: TokenContractParams,
     abi: Abi = erc20Abi,
 ) {
-    const { data: owner } = useReadContract({
+    const { data: owner, isLoading, isError, error, refetch } = useReadContract({
         address: contractAddress,
         abi,
         functionName: "owner",
         chainId,
         query: { enabled: Boolean(contractAddress) },
     })
-    return owner as Address | undefined
+    return {
+        owner: owner as Address | undefined,
+        isLoading,
+        isError,
+        error,
+        refetch,
+    }
 }
 
 export function useERC20TokenMeta(
     { contractAddress, chainId }: TokenContractParams,
     abi: Abi = erc20Abi,
 ) {
-    const { data: name } = useReadContract({
+    const nameQuery = useReadContract({
         address: contractAddress,
         abi,
         functionName: "name",
@@ -40,7 +44,7 @@ export function useERC20TokenMeta(
         query: { enabled: Boolean(contractAddress) },
     })
 
-    const { data: decimals } = useReadContract({
+    const decimalsQuery = useReadContract({
         address: contractAddress,
         abi,
         functionName: "decimals",
@@ -48,7 +52,7 @@ export function useERC20TokenMeta(
         query: { enabled: Boolean(contractAddress) },
     })
 
-    const { data: symbol } = useReadContract({
+    const symbolQuery = useReadContract({
         address: contractAddress,
         abi,
         functionName: "symbol",
@@ -56,5 +60,12 @@ export function useERC20TokenMeta(
         query: { enabled: Boolean(contractAddress) },
     })
 
-    return { name, decimals, symbol } as Partial<TokenMeta>
+    return {
+        name: nameQuery.data as string | undefined,
+        decimals: decimalsQuery.data as number | undefined,
+        symbol: symbolQuery.data as string | undefined,
+        isLoading: nameQuery.isLoading || decimalsQuery.isLoading || symbolQuery.isLoading,
+        isError: nameQuery.isError || decimalsQuery.isError || symbolQuery.isError,
+        error: nameQuery.error ?? decimalsQuery.error ?? symbolQuery.error,
+    }
 }

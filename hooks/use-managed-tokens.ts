@@ -1,3 +1,8 @@
+import {
+  DEFAULT_TOKEN_KIND,
+  isTokenKindId,
+  type TokenKindId,
+} from "@/lib/token-kinds"
 import { useLocalStorage } from "./use-local-storage"
 
 export type ManagedToken = {
@@ -5,15 +10,25 @@ export type ManagedToken = {
     label: string
     chainId: number
     address: `0x${string}`
+    kind: TokenKindId
 }
 
 const STORAGE_KEY = "token-dashboard:managed-tokens"
 
+function normalizeToken(token: ManagedToken): ManagedToken {
+  return {
+    ...token,
+    kind: isTokenKindId(token.kind) ? token.kind : DEFAULT_TOKEN_KIND,
+  }
+}
+
 export function useManagedTokens() {
-  const [tokens, setTokens, { hydrated, remove }] = useLocalStorage<ManagedToken[]>(
+  const [rawTokens, setTokens, { hydrated, remove }] = useLocalStorage<ManagedToken[]>(
     STORAGE_KEY,
     [],
   )
+
+  const tokens = rawTokens.map(normalizeToken)
 
   function addToken(token: ManagedToken) {
     setTokens((prev) => {
@@ -22,7 +37,7 @@ export function useManagedTokens() {
           t.chainId === token.chainId &&
           t.address.toLowerCase() === token.address.toLowerCase(),
       )
-      return exists ? prev : [...prev, token]
+      return exists ? prev : [...prev, normalizeToken(token)]
     })
   }
 

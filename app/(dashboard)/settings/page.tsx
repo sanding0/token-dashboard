@@ -18,6 +18,13 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useManagedTokens } from "@/hooks/use-managed-tokens"
+import {
+    DEFAULT_TOKEN_KIND,
+    TOKEN_KINDS,
+    TOKEN_KIND_IDS,
+    getTokenKind,
+    type TokenKindId,
+} from "@/lib/token-kinds"
 import { Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -32,6 +39,7 @@ export default function SettingsPage() {
     const [label, setLabel] = useState("")
     const [address, setAddress] = useState("")
     const [chainId, setChainId] = useState<number>(walletChainId || chains[0]?.id || 1)
+    const [kind, setKind] = useState<TokenKindId>(DEFAULT_TOKEN_KIND)
 
     const handleAdd = (e: React.SubmitEvent) => {
         e.preventDefault()
@@ -68,10 +76,12 @@ export default function SettingsPage() {
             label: trimmedLabel,
             chainId,
             address: normalized,
+            kind,
         })
 
         setLabel("")
         setAddress("")
+        setKind(DEFAULT_TOKEN_KIND)
         toast.success("Token added")
     }
 
@@ -132,6 +142,25 @@ export default function SettingsPage() {
                             </Field>
 
                             <Field>
+                                <FieldLabel htmlFor="token-kind">Type</FieldLabel>
+                                <select
+                                    id="token-kind"
+                                    value={kind}
+                                    onChange={(e) => setKind(e.target.value as TokenKindId)}
+                                    className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                                >
+                                    {TOKEN_KIND_IDS.map((id) => (
+                                        <option key={id} value={id}>
+                                            {TOKEN_KINDS[id].label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <FieldDescription>
+                                    {TOKEN_KINDS[kind].description}
+                                </FieldDescription>
+                            </Field>
+
+                            <Field>
                                 <FieldLabel htmlFor="token-address">Contract address</FieldLabel>
                                 <Input
                                     id="token-address"
@@ -183,7 +212,8 @@ export default function SettingsPage() {
                                             <div className="min-w-0">
                                                 <p className="font-medium">{token.label}</p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    {chain?.name ?? "Unknown"} · {token.chainId}
+                                                    {chain?.name ?? "Unknown"} · {token.chainId} ·{" "}
+                                                    {getTokenKind(token.kind).label}
                                                 </p>
                                                 <p className="truncate font-mono text-xs text-muted-foreground">
                                                     {token.address}
