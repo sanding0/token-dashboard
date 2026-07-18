@@ -11,7 +11,6 @@ export default function WalletComponent({
     const { status, connector } = useConnection()
     useConnectionEffect({
         onConnect(data) {
-            console.log(data, 'onConnect');
             if (!data.isReconnected) {
                 toast.success('Wallet connected successfully');
             }
@@ -22,7 +21,7 @@ export default function WalletComponent({
     })
 
     return (
-        <div className="p-2 flex justify-end w-full shrink-0" {...props}>
+        <div className="flex shrink-0 items-center justify-end" {...props}>
             {status === 'connected' ? <WalletInfo connector={connector} /> : <ConnectButton />}
         </div>
     )

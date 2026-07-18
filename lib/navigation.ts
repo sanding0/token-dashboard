@@ -27,7 +27,7 @@ export const navigationItems: NavigationEntry[] = [
         icon: Plus,
     },
     {
-        label: "settings",
+        label: "Settings",
         href: "/settings",
         icon: Settings,
     }

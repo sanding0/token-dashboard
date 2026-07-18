@@ -1,5 +1,3 @@
-'use client'
-
 import { Button } from "@/components/ui/button"
 import { getConnectErrorMessage } from "@/lib/wallet-errors"
 import { toast } from "sonner"
@@ -26,10 +24,12 @@ export default function ConnectButton() {
     }
 
     return (
-        <div className="flex items-center gap-2 md:flex-row">
+        <div className="flex max-w-[min(100%,18rem)] flex-wrap items-center justify-end gap-1.5 sm:max-w-none">
             {connectors.map((connector) => (
                 <Button
                     key={connector.uid}
+                    size="sm"
+                    className="max-w-34 truncate sm:max-w-none"
                     onClick={() => handleConnect(connector)}
                 >
                     {connector.name}
