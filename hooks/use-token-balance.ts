@@ -1,5 +1,3 @@
-'use client'
-
 import { erc20Abi, formatUnits, type Abi, type Address } from "viem"
 import { useReadContract } from "wagmi"
 

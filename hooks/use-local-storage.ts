@@ -1,10 +1,8 @@
-"use client"
-
 import { useCallback, useSyncExternalStore } from "react"
 
 function subscribe(onChange: () => void) {
   window.addEventListener("storage", onChange)
-  window.addEventListener("local-storage", onChange) // 同页写入也通知
+  window.addEventListener("local-storage", onChange)
   return () => {
     window.removeEventListener("storage", onChange)
     window.removeEventListener("local-storage", onChange)

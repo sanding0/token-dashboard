@@ -1,5 +1,3 @@
-'use client'
-
 import { arbitrum, mainnet, polygon, sepolia } from 'viem/chains'
 import { cn } from '@/lib/utils'
 type ChainIconProps = {

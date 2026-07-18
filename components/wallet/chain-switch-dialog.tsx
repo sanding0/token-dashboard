@@ -1,5 +1,3 @@
-'use client'
-
 import ChainIcon from "@/components/common/chain-icon";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
