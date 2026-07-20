@@ -49,3 +49,15 @@ export function getMintErrorMessage(error: unknown): string | null {
     }
     return 'Mint transaction failed, please try again later'
 }
+
+export function getTransferErrorMessage(error: unknown): string | null {
+    if (isUserRejected(error)) return "User rejected the transaction"
+    if (error && typeof error === "object" && "shortMessage" in error) {
+        const msg = (error as { shortMessage: string }).shortMessage
+        if (msg) return msg
+    }
+    if (error instanceof Error) {
+        return error.message
+    }
+    return "Transfer failed, please try again later"
+}
