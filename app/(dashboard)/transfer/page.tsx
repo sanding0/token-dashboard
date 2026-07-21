@@ -12,42 +12,39 @@ import {
 } from "@/components/ui/card"
 import { useManagedTokens } from "@/hooks/use-managed-tokens"
 import { getTokenAbi, getTokenKind, tokenHasCapability } from "@/lib/token-kinds"
-import Link from "next/link"
-import { useState } from "react"
-import { useConnection } from "wagmi"
+import { useMemo, useState } from "react"
+import { useChains, useConnection } from "wagmi"
+import NativeTransferForm from "./native-transfer-form"
 import TransferForm from "./transfer-form"
+
+const NATIVE_SELECTION_ID = "native"
 
 export default function TransferPage() {
     const { address, isConnected, chainId } = useConnection()
+    const chains = useChains()
     const { tokens, hydrated } = useManagedTokens()
-    const [selectedId, setSelectedId] = useState<string | null>(null)
+    const [selectedId, setSelectedId] = useState<string>(NATIVE_SELECTION_ID)
 
     const transferableTokens = tokens.filter((t) =>
         tokenHasCapability(t.kind, "transfer"),
     )
 
+    const nativeChain = useMemo(
+        () => chains.find((c) => c.id === chainId),
+        [chains, chainId],
+    )
+    const nativeSymbol = nativeChain?.nativeCurrency.symbol ?? "ETH"
+
+    const isNativeActive =
+        selectedId === NATIVE_SELECTION_ID ||
+        !transferableTokens.some((t) => t.id === selectedId)
+
+    const activeToken = isNativeActive
+        ? null
+        : transferableTokens.find((t) => t.id === selectedId) ?? null
+
     if (!hydrated) {
         return <p className="text-sm text-muted-foreground">Loading…</p>
-    }
-
-    if (transferableTokens.length === 0) {
-        return (
-            <PageShell>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>No transferable tokens</CardTitle>
-                        <CardDescription>
-                            Add an ERC20 or Ownable + Mint token in Settings first.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Button nativeButton={false} render={<Link href="/settings" />}>
-                            Go to Settings
-                        </Button>
-                    </CardContent>
-                </Card>
-            </PageShell>
-        )
     }
 
     if (!isConnected || !address || !chainId) {
@@ -57,7 +54,7 @@ export default function TransferPage() {
                     <CardHeader>
                         <CardTitle>Wallet not connected</CardTitle>
                         <CardDescription>
-                            Connect a wallet to transfer tokens.
+                            Connect a wallet to transfer native currency or tokens.
                         </CardDescription>
                     </CardHeader>
                 </Card>
@@ -65,27 +62,40 @@ export default function TransferPage() {
         )
     }
 
-    const selected =
-        transferableTokens.find((t) => t.id === selectedId) ?? transferableTokens[0]
-
     return (
         <PageShell>
             <PageHeader
                 title="Transfer"
-                description="Send tokens from your wallet. Switch to the token's chain before signing."
+                description="Send native currency or ERC20 tokens. Switch network before signing if needed."
             />
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Select token</CardTitle>
+                    <CardTitle>Select asset</CardTitle>
                     <CardDescription>
-                        Any managed token with transfer support.
+                        Native currency on your connected chain, or a managed token.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="flex flex-col gap-2">
+                        <Button
+                            type="button"
+                            variant={isNativeActive ? "secondary" : "ghost"}
+                            size="lg"
+                            className="h-auto w-full justify-start gap-2 py-2"
+                            onClick={() => setSelectedId(NATIVE_SELECTION_ID)}
+                        >
+                            <ChainIcon chainId={chainId} className="shrink-0" />
+                            <span className="flex min-w-0 flex-col items-start text-left">
+                                <span className="truncate">{nativeSymbol}</span>
+                                <span className="text-xs font-normal text-muted-foreground">
+                                    Native · {nativeChain?.name ?? `Chain ${chainId}`}
+                                </span>
+                            </span>
+                        </Button>
+
                         {transferableTokens.map((token) => {
-                            const isActive = token.id === selected.id
+                            const isActive = activeToken?.id === token.id
                             return (
                                 <Button
                                     key={token.id}
@@ -112,15 +122,24 @@ export default function TransferPage() {
                 </CardContent>
             </Card>
 
-            <TransferForm
-                key={selected.id}
-                chainId={selected.chainId}
-                address={selected.address}
-                label={selected.label}
-                abi={getTokenAbi(selected.kind)}
-                walletAddress={address}
-                walletChainId={chainId}
-            />
+            {isNativeActive ? (
+                <NativeTransferForm
+                    key={`native-${chainId}`}
+                    chainId={chainId}
+                    walletAddress={address}
+                    walletChainId={chainId}
+                />
+            ) : activeToken ? (
+                <TransferForm
+                    key={activeToken.id}
+                    chainId={activeToken.chainId}
+                    address={activeToken.address}
+                    label={activeToken.label}
+                    abi={getTokenAbi(activeToken.kind)}
+                    walletAddress={address}
+                    walletChainId={chainId}
+                />
+            ) : null}
         </PageShell>
     )
 }
