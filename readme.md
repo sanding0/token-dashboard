@@ -21,11 +21,18 @@ pnpm dev
 
 ### Env
 
-| Variable | Required | Notes |
-|----------|----------|-------|
-| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | Optional | Enables WalletConnect; injected wallet works without it |
-| `NEXT_PUBLIC_MAINNET_RPC_URL` | Optional | Mainnet RPC override |
-| `NEXT_PUBLIC_CONTRACT_ADDRESS` | Optional | Default Anvil deploy address for local demos |
+Copy `.env.example` → `.env.local` for the Next app. Put deploy keys in `contracts/.env`.
+
+| Variable | Where | Notes |
+|----------|-------|-------|
+| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | `.env.local` | Optional; enables WalletConnect |
+| `NEXT_PUBLIC_MAINNET_RPC_URL` | `.env.local` | Optional mainnet RPC override |
+| `NEXT_PUBLIC_SEPOLIA_RPC_URL` | `.env.local` | Browser RPC; keep as `/api/rpc/sepolia` (proxy path, no key) |
+| `SEPOLIA_RPC_URL` | `.env.local` | Server-only Alchemy/Infura URL for the proxy **and** `pnpm deploy:sepolia` |
+| `NEXT_PUBLIC_APP_URL` | `.env.local` | Optional; proxy same-origin allowlist |
+| `NEXT_PUBLIC_CONTRACT_ADDRESS` | `.env.local` | Optional; default Anvil demo address |
+| `SEPOLIA_DEPLOYER_PRIVATE_KEY` | `contracts/.env` | Deployer key for Sepolia |
+| `ETHERSCAN_API_KEY` | `contracts/.env` | Optional; enables forge `--verify` |
 
 ## Local Anvil demo
 
@@ -44,6 +51,29 @@ pnpm dev
 3. **Dashboard** → check balance
 4. **Mint** → select token → switch chain if needed → mint as owner
 
+## Deploy to Sepolia
+
+1. Root `.env.local` — shared RPC (also used by the Next proxy):
+
+```bash
+SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/<key>
+NEXT_PUBLIC_SEPOLIA_RPC_URL=/api/rpc/sepolia
+```
+
+2. `contracts/.env` — deploy secrets only (see `contracts/.env.example`):
+
+```bash
+SEPOLIA_DEPLOYER_PRIVATE_KEY=0x...
+ETHERSCAN_API_KEY=...   # optional — enables forge --verify
+```
+
+```bash
+pnpm deploy:anvil    # local Anvil (optional keys; defaults work)
+pnpm deploy:sepolia  # reads SEPOLIA_RPC_URL from .env.local + key from contracts/.env
+```
+
+Deployer must have Sepolia ETH. After deploy, add the printed address in **Settings** (Sepolia · Ownable + Mint).
+
 ## Scripts
 
 | Script | Description |
@@ -52,3 +82,4 @@ pnpm dev
 | `pnpm contracts:build` | Forge build |
 | `pnpm abi:sync` | Build + export ABI to `lib/abis` |
 | `pnpm deploy:anvil` | Deploy MyToken to local Anvil |
+| `pnpm deploy:sepolia` | Deploy MyToken to Sepolia (optional verify) |
