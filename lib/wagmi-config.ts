@@ -21,7 +21,7 @@ export const wagmiConfig = createConfig({
     ],
     transports: {
         [mainnet.id]: http(process.env.NEXT_PUBLIC_MAINNET_RPC_URL || undefined),
-        [sepolia.id]: http(),
+        [sepolia.id]: http(process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL || undefined),
         [arbitrum.id]: http(),
         [polygon.id]: http(),
         [anvil.id]: http(),

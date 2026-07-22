@@ -11,7 +11,8 @@
     "abi:export": "node scripts/export-abi.mjs",
     "abi:sync": "pnpm contracts:build && pnpm abi:export",
     "abi:check": "node scripts/check-abi-staged.mjs",
-    "deploy:anvil": "node scripts/deploy-anvil.mjs"
+    "deploy:anvil": "node scripts/deploy-anvil.mjs",
+    "deploy:sepolia": "node scripts/deploy-sepolia.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs}": "eslint --fix",
