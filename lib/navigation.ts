@@ -1,4 +1,11 @@
-import { ArrowLeftRight, House, Plus, Settings, type LucideIcon } from "lucide-react"
+import {
+    Activity,
+    ArrowLeftRight,
+    House,
+    Plus,
+    Settings,
+    type LucideIcon,
+} from "lucide-react"
 
 export type NavigationItem = {
     label: string
@@ -30,6 +37,11 @@ export const navigationItems: NavigationEntry[] = [
         label: "Transfer",
         href: "/transfer",
         icon: ArrowLeftRight,
+    },
+    {
+        label: "Activity",
+        href: "/activity",
+        icon: Activity,
     },
     {
         label: "Settings",
