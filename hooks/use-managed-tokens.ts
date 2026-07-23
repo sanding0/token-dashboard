@@ -11,14 +11,30 @@ export type ManagedToken = {
     chainId: number
     address: `0x${string}`
     kind: TokenKindId
+    deployedAtBlock?: string
 }
 
 const STORAGE_KEY = "token-dashboard:managed-tokens"
 
 function normalizeToken(token: ManagedToken): ManagedToken {
+  const kind = isTokenKindId(token.kind) ? token.kind : DEFAULT_TOKEN_KIND
+  const deployedAtBlock = token.deployedAtBlock ? parseDeployedAtBlock(token.deployedAtBlock) : null
   return {
     ...token,
-    kind: isTokenKindId(token.kind) ? token.kind : DEFAULT_TOKEN_KIND,
+    kind,
+    ...(deployedAtBlock ? { deployedAtBlock } : {}),
+  }
+}
+
+export function parseDeployedAtBlock(raw: string): string | undefined {
+  const trimmed = raw.trim()
+  if (!trimmed) return 
+  try {
+    const value = BigInt(trimmed)
+    if (value < BigInt(0)) return
+    return value.toString()
+  } catch {
+    return
   }
 }
 

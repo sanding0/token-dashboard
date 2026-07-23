@@ -17,7 +17,7 @@ import {
     FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { useManagedTokens } from "@/hooks/use-managed-tokens"
+import { useManagedTokens, parseDeployedAtBlock } from "@/hooks/use-managed-tokens"
 import {
     DEFAULT_TOKEN_KIND,
     TOKEN_KINDS,
@@ -40,6 +40,7 @@ export default function SettingsPage() {
     const [address, setAddress] = useState("")
     const [chainId, setChainId] = useState<number>(walletChainId || chains[0]?.id || 1)
     const [kind, setKind] = useState<TokenKindId>(DEFAULT_TOKEN_KIND)
+    const [deployedAtBlock, setDeployedAtBlock] = useState("")
 
     const handleAdd = (e: React.SubmitEvent) => {
         e.preventDefault()
@@ -60,6 +61,13 @@ export default function SettingsPage() {
             return
         }
 
+        const blockRaw = deployedAtBlock.trim()
+        const parsedBlock = blockRaw ? parseDeployedAtBlock(blockRaw) : undefined
+        if (blockRaw && parsedBlock === undefined) {
+            toast.error("Deploy block must be a non-negative integer (decimal or 0x-hex)")
+            return
+        }
+
         const normalized = getAddress(address)
         const exists = tokens.some(
             (t) =>
@@ -77,11 +85,13 @@ export default function SettingsPage() {
             chainId,
             address: normalized,
             kind,
+            ...(parsedBlock ? { deployedAtBlock: parsedBlock } : {}),
         })
 
         setLabel("")
         setAddress("")
         setKind(DEFAULT_TOKEN_KIND)
+        setDeployedAtBlock("")
         toast.success("Token added")
     }
 
@@ -171,6 +181,24 @@ export default function SettingsPage() {
                                 />
                             </Field>
 
+                            <Field>
+                                <FieldLabel htmlFor="token-deploy-block">
+                                    Deploy block (optional)
+                                </FieldLabel>
+                                <Input
+                                    id="token-deploy-block"
+                                    placeholder="11335166 or 0xacd5fe"
+                                    value={deployedAtBlock}
+                                    onChange={(e) => setDeployedAtBlock(e.target.value)}
+                                    spellCheck={false}
+                                    inputMode="numeric"
+                                />
+                                <FieldDescription>
+                                    Used by Activity as the from-block. From forge broadcast
+                                    receipt.blockNumber if you have it.
+                                </FieldDescription>
+                            </Field>
+
                             <Button type="submit">Add token</Button>
                         </FieldGroup>
                     </form>
@@ -218,6 +246,11 @@ export default function SettingsPage() {
                                                 <p className="truncate font-mono text-xs text-muted-foreground">
                                                     {token.address}
                                                 </p>
+                                                {token.deployedAtBlock ? (
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Deploy block {token.deployedAtBlock}
+                                                    </p>
+                                                ) : null}
                                             </div>
                                         </div>
                                         <Button
